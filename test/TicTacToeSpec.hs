@@ -9,6 +9,7 @@ import Data.Maybe
 
 import TicTacToe
 
+
 spec :: Spec
 spec = do
   describe "board creation" $ do
@@ -55,4 +56,13 @@ spec = do
         let actual = gameToString $ GameState game
         actual `shouldBe` expected
         (displayBoard (GameState game)) >>= \x -> putStrLn expected >>= (`shouldBe` x)
+
+  describe "get move" $ do
+    let f :: Int -> IO Int
+        f n = return n
+    it "returns move" $ do
+      let getR _ = f 1
+      let getC = f 1
+      getMove "x" getR getC `shouldReturn` (Move 1 1 "x")
+        
         
