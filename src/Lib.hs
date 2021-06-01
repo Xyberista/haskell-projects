@@ -1,6 +1,8 @@
 module Lib
-    ( someFunc
+    ( runTicTacToe
     ) where
 
-someFunc :: IO ()
-someFunc = putStrLn "someFunc"
+import qualified TicTacToe as Tic
+
+runTicTacToe :: IO ()
+runTicTacToe = Tic.runGame
