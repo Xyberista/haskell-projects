@@ -1,0 +1,13 @@
+cradle:
+  stack:
+    - path: "./src"
+      component: "haskell-projects:lib"
+
+    - path: "./app/Main.hs"
+      component: "haskell-projects:exe:haskell-projects-exe"
+
+    - path: "./app/Paths_haskell_projects.hs"
+      component: "haskell-projects:exe:haskell-projects-exe"
+
+    - path: "./test"
+      component: "haskell-projects:test:haskell-projects-test"
