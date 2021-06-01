@@ -1,6 +1,7 @@
-module TicTacToe where
+module TicTacToe (runGame) where
 
 import           Control.Monad.IO.Class
+import           Data.Char
 import           Data.List
 import qualified Data.Map as Map
 import           Data.Maybe
@@ -40,7 +41,6 @@ makeMove board (Move x y sym) =
 getRow :: String -> IO Int
 getRow sym = do
   putStrLn $ "What is your row number, player " ++ sym ++ "? (0 to 2)"
-  putStr ">"
   y <- getLine
   if y `elem` ["0","1","2"] then return $ read y
   else putStrLn "Please enter a valid row number." >> getRow sym
@@ -48,21 +48,19 @@ getRow sym = do
 getCol :: IO Int
 getCol = do
   putStrLn $ "What is your column number? (0 to 2)"
-  putStr ">"
   x <- getLine
   if x `elem` ["0","1","2"] then return $ read x
   else putStrLn "Please enter a valid row number." >> getCol
   
 getMove :: String -> (String -> IO Int) -> IO Int -> IO Move
 getMove sym getR getC = do
-  x <- getR sym
-  y <- getC
+  y <- getR sym
+  x <- getC
   return $ Move x y sym
 
 getStarter :: IO String
 getStarter = do
   putStrLn "Who will start the game? (x or o)"
-  putStr ">"
   starter <- getLine
   case starter of "x" -> return "x"
                   "o" -> return "o"
@@ -83,21 +81,54 @@ checkPlayerOne board = checkForWin board "x"
 
 checkPlayerTwo :: Board -> Bool
 checkPlayerTwo board = checkForWin board "o"
+
+checkForDraw :: Board -> Bool
+checkForDraw board = all (all (/="")) rowsList
+  where rowsList = Map.foldr (\x res -> Map.foldr (\y r -> y : r) [] x : res) [] board
+
+winSequence :: String -> Bool -> IO Bool
+winSequence player won = do
+  putStrLn "=========="
+  (if won then 
+    putStrLn $ "Player " ++ player ++ " wins!"
+  else 
+    putStrLn "It was a draw!")
+  putStrLn "Would you like to play again? (y/n)"
+  choice <- getLine
+  makeChoice choice
+                             
+makeChoice :: String -> IO Bool
+makeChoice choice = case map toLower choice of "y" -> return True
+                                               "yes" -> return True
+                                               "n" -> return False
+                                               "no" -> return False
+                                               _   -> do
+                                                 putStrLn "Enter valid option."
+                                                 putStrLn "Would you like to play again? (y/n)"
+                                                 newChoice <- getLine
+                                                 makeChoice newChoice
   
 -- todo: implement both functions below
-step :: Board -> String -> IO Board
+step :: Board -> String -> IO Bool
 step board player = do
-  let a = getMove player getRow getCol 
-  return board
+  displayBoard board
+  move <- getMove player getRow getCol
+  let (possible, newBoard) = makeMove board move
+  if not possible then putStrLn "Please enter a valid move" >> step board player
+  else do
+    if checkForWin newBoard player then displayBoard newBoard >> winSequence player True
+    else if checkForDraw newBoard then displayBoard newBoard >> winSequence player False
+         else case player of "x" -> step newBoard "o"
+                             "o" -> step newBoard "x"
 
 runGame :: IO ()
 runGame = do
   starter <- getStarter
   let board = emptyBoard
-  displayBoard board
   
-  step board starter
-  return ()
+  continue <- step board starter
+  if continue then runGame
+  else putStrLn "Returning to main menu."
   
   
-  
+
