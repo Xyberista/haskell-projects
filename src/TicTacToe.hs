@@ -5,6 +5,7 @@ import           Data.Char
 import           Data.List
 import qualified Data.Map as Map
 import           Data.Maybe
+import           System.Console.ANSI
 
 data Move = Move { col :: Int
                  , row :: Int
@@ -38,6 +39,8 @@ makeMove board (Move x y sym) =
   else (False, board)
   where taken = ("" /=) . fromJust . Map.lookup x . fromJust $ Map.lookup y board
 
+-- Get Move
+-- -------------------------------------------------------------------
 getRow :: String -> IO Int
 getRow sym = do
   putStrLn $ "What is your row number, player " ++ sym ++ "? (0 to 2)"
@@ -58,13 +61,15 @@ getMove sym getR getC = do
   x <- getC
   return $ Move x y sym
 
+-- -------------------------------------------------------------------
+
 getStarter :: IO String
 getStarter = do
   putStrLn "Who will start the game? (x or o)"
   starter <- getLine
   case starter of "x" -> return "x"
                   "o" -> return "o"
-                  _   -> putStrLn "please enter a valid starter" >> getStarter
+                  _   -> clearScreen >> putStrLn "Please enter a valid starter" >> getStarter
 
 checkForWin :: Board -> String -> Bool
 checkForWin board player =
@@ -111,11 +116,14 @@ makeChoice choice = case map toLower choice of "y" -> return True
 -- todo: implement both functions below
 step :: Board -> String -> IO Bool
 step board player = do
+  clearScreen
+  
   displayBoard board
   move <- getMove player getRow getCol
   let (possible, newBoard) = makeMove board move
-  if not possible then putStrLn "Please enter a valid move" >> step board player
+  if not possible then clearScreen >> putStrLn "Please enter a valid move" >> step board player
   else do
+    clearScreen
     if checkForWin newBoard player then displayBoard newBoard >> winSequence player True
     else if checkForDraw newBoard then displayBoard newBoard >> winSequence player False
          else case player of "x" -> step newBoard "o"
@@ -127,7 +135,7 @@ runGame = do
   let board = emptyBoard
   
   continue <- step board starter
-  if continue then runGame
+  if continue then clearScreen >> runGame
   else putStrLn "Returning to main menu."
   
   
