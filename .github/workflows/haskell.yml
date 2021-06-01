@@ -11,8 +11,6 @@ jobs:
           ghc-version: '9.0.1'
           enable-stack: true
           stack-version: 'latest'
-      - run: stack build
-      - run: stack test
       - name: Cache
         uses: actions/cache@v1
         env:
