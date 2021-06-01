@@ -77,6 +77,7 @@ spec = do
       it "return False" $ do
         let board = emptyBoard
         let (_,newBoard) = makeMove board (Move 0 0 "x")
+        displayBoard newBoard
         checkForWin newBoard "x" `shouldBe` False
         checkForWin newBoard "y" `shouldBe` False
 
@@ -84,8 +85,8 @@ spec = do
       it "return True" $ do
         let board = emptyBoard
         let (_,a) = makeMove board (Move 0 0 "x")
-        let (_,b) = makeMove board (Move 0 1 "x")
-        let (_,newBoard) = makeMove board (Move 0 2 "x")
+        let (_,b) = makeMove a (Move 0 1 "x")
+        let (_,newBoard) = makeMove b (Move 0 2 "x")
         checkForWin newBoard "x" `shouldBe` True
         checkForWin newBoard "y" `shouldBe` False
       
@@ -93,8 +94,8 @@ spec = do
       it "return True" $ do
         let board = emptyBoard
         let (_,a) = makeMove board (Move 0 0 "x")
-        let (_,b) = makeMove board (Move 1 1 "x")
-        let (_,newBoard) = makeMove board (Move 2 2 "x")
+        let (_,b) = makeMove a (Move 1 1 "x")
+        let (_,newBoard) = makeMove b (Move 2 2 "x")
         checkForWin newBoard "x" `shouldBe` True
         checkForWin newBoard "y" `shouldBe` False
 
@@ -102,7 +103,7 @@ spec = do
       it "return True" $ do
         let board = emptyBoard
         let (_,a) = makeMove board (Move 0 0 "x")
-        let (_,b) = makeMove board (Move 1 0 "x")
-        let (_,newBoard) = makeMove board (Move 2 0 "x")
+        let (_,b) = makeMove a (Move 1 0 "x")
+        let (_,newBoard) = makeMove b (Move 2 0 "x")
         checkForWin newBoard "x" `shouldBe` True
         checkForWin newBoard "y" `shouldBe` False
