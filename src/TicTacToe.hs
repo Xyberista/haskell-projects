@@ -1,5 +1,6 @@
 module TicTacToe where
 
+import           Control.Monad.IO.Class
 import           Data.List
 import qualified Data.Map as Map
 import           Data.Maybe
@@ -12,6 +13,12 @@ data GameState = GameState Board
 
 type Board = Map.Map Int Row
 type Row = Map.Map Int String
+  
+instance Eq Move where
+  (Move a b c) == (Move d e f) = a == d && b == e && c == f
+  
+instance Show Move where
+  show (Move x y sym) = show x ++ show y ++ sym
 
 gameToString :: GameState -> String
 gameToString (GameState board) =
@@ -32,13 +39,24 @@ makeMove board (Move x y sym) =
   else (False, board)
   where taken = ("" /=) . fromJust . Map.lookup x . fromJust $ Map.lookup y board
 
--- no tests written for this yet
-getMove :: String -> IO Move
-getMove sym = do
+getRow :: String -> IO Int
+getRow sym = do
   putStrLn $ "What is your row number, player " ++ sym ++ "? (0 to 2)"
   putStr ">"
   y <- getLine
-  putStrLn $ "What is your column number?"
+  if y `elem` ["0","1","2"] then return $ read y
+  else putStrLn "Please enter a valid row number." >> getRow sym
+
+getCol :: IO Int
+getCol = do
+  putStrLn $ "What is your column number? (0 to 2)"
   putStr ">"
   x <- getLine
-  return $ Move (read x) (read y) sym
+  if x `elem` ["0","1","2"] then return $ read x
+  else putStrLn "Please enter a valid row number." >> getCol
+  
+getMove :: String -> (String -> IO Int) -> IO Int -> IO Move
+getMove sym getR getC = do
+  x <- getR sym
+  y <- getC
+  return $ Move x y sym
