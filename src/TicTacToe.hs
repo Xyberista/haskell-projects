@@ -8,8 +8,6 @@ import           Data.Maybe
 data Move = Move { col :: Int
                  , row :: Int
                  , symbol :: String}
-            
-data GameState = GameState Board
 
 type Board = Map.Map Int Row
 type Row = Map.Map Int String
@@ -20,13 +18,13 @@ instance Eq Move where
 instance Show Move where
   show (Move x y sym) = show x ++ show y ++ sym
 
-gameToString :: GameState -> String
-gameToString (GameState board) =
+gameToString :: Board -> String
+gameToString board =
   intercalate "-----\n" $ Map.foldr (\y r -> ((intercalate "|" $ get y) ++ "\n") : r) [] board
   where get :: Row -> [String]
         get a = Map.foldr (\x c -> (if x == "" then " " else x) : c) [] a
 
-displayBoard :: GameState -> IO ()
+displayBoard :: Board -> IO ()
 displayBoard game = putStrLn $ gameToString game
 
 emptyBoard :: Board
@@ -60,3 +58,45 @@ getMove sym getR getC = do
   x <- getR sym
   y <- getC
   return $ Move x y sym
+
+getStarter :: IO String
+getStarter = do
+  putStrLn "Who will start the game? (x or o)"
+  putStr ">"
+  starter <- getLine
+  case starter of "x" -> return "x"
+                  "o" -> return "o"
+                  _   -> putStrLn "please enter a valid starter" >> getStarter
+
+checkForWin :: Board -> String -> Bool
+checkForWin board player =
+  all (==player) rows || all (==player) columns
+  || all (==player) diagonalOne || all(==player) diagonalTwo
+  where rows = Map.foldr (\x res -> Map.foldr (\y r -> y : r) [] x ++ res) [] board
+        columns = map (\y -> map (\r -> r !! y) rows) [0..2]
+        diagonalOne = zipWith (\y r -> [r !! y]) [0,1,2] rows
+        diagonalTwo = zipWith (\y r -> [r !! y]) [2,1,0] rows
+
+checkPlayerOne :: Board -> Bool
+checkPlayerOne board = checkForWin board "x"
+
+checkPlayerTwo :: Board -> Bool
+checkPlayerTwo board = checkForWin board "o"
+  
+-- todo: implement both functions below
+step :: Board -> String -> IO Board
+step board player = do
+  let a = getMove player getRow getCol 
+  return board
+
+runGame :: IO ()
+runGame = do
+  starter <- getStarter
+  let board = emptyBoard
+  displayBoard board
+  
+  step board starter
+  return ()
+  
+  
+  

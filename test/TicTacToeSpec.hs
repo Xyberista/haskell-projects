@@ -44,7 +44,7 @@ spec = do
     context "when empty board" $ do
       it "prints empty board" $ do
         let expected = " | | \n-----\n | | \n-----\n | | \n"
-        let game = GameState emptyBoard
+        let game = emptyBoard
         let actual = gameToString game
         actual `shouldBe` expected
         (displayBoard game) >>= \x -> putStrLn expected >>= (`shouldBe` x)
@@ -53,9 +53,9 @@ spec = do
       it "prints board" $ do
         let expected = "x| | \n-----\n | | \n-----\n | | \n"
         let (_, game) = makeMove emptyBoard (Move 0 0 "x")
-        let actual = gameToString $ GameState game
+        let actual = gameToString game
         actual `shouldBe` expected
-        (displayBoard (GameState game)) >>= \x -> putStrLn expected >>= (`shouldBe` x)
+        (displayBoard game) >>= \x -> putStrLn expected >>= (`shouldBe` x)
 
   describe "get move" $ do
     let f :: Int -> IO Int
@@ -65,4 +65,44 @@ spec = do
       let getC = f 1
       getMove "x" getR getC `shouldReturn` (Move 1 1 "x")
         
+
+  describe "check for win" $ do
+    context "when empty board" $ do
+      it "return False" $ do
+        let board = emptyBoard
+        checkForWin board "x" `shouldBe` False
+        checkForWin board "y" `shouldBe` False
         
+    context "when non-empty board with no win" $ do
+      it "return False" $ do
+        let board = emptyBoard
+        let (_,newBoard) = makeMove board (Move 0 0 "x")
+        checkForWin newBoard "x" `shouldBe` False
+        checkForWin newBoard "y" `shouldBe` False
+
+    context "when x wins vertically" $ do
+      it "return True" $ do
+        let board = emptyBoard
+        let (_,a) = makeMove board (Move 0 0 "x")
+        let (_,b) = makeMove board (Move 0 1 "x")
+        let (_,newBoard) = makeMove board (Move 0 2 "x")
+        checkForWin newBoard "x" `shouldBe` True
+        checkForWin newBoard "y" `shouldBe` False
+      
+    context "when x wins diagonally" $ do
+      it "return True" $ do
+        let board = emptyBoard
+        let (_,a) = makeMove board (Move 0 0 "x")
+        let (_,b) = makeMove board (Move 1 1 "x")
+        let (_,newBoard) = makeMove board (Move 2 2 "x")
+        checkForWin newBoard "x" `shouldBe` True
+        checkForWin newBoard "y" `shouldBe` False
+
+    context "when x wins horizontally" $ do
+      it "return True" $ do
+        let board = emptyBoard
+        let (_,a) = makeMove board (Move 0 0 "x")
+        let (_,b) = makeMove board (Move 1 0 "x")
+        let (_,newBoard) = makeMove board (Move 2 0 "x")
+        checkForWin newBoard "x" `shouldBe` True
+        checkForWin newBoard "y" `shouldBe` False
