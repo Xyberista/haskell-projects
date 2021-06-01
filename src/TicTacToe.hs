@@ -70,12 +70,13 @@ getStarter = do
 
 checkForWin :: Board -> String -> Bool
 checkForWin board player =
-  all (==player) rows || all (==player) columns
-  || all (==player) diagonalOne || all(==player) diagonalTwo
-  where rows = Map.foldr (\x res -> Map.foldr (\y r -> y : r) [] x ++ res) [] board
-        columns = map (\y -> map (\r -> r !! y) rows) [0..2]
-        diagonalOne = zipWith (\y r -> [r !! y]) [0,1,2] rows
-        diagonalTwo = zipWith (\y r -> [r !! y]) [2,1,0] rows
+  any (all (==player)) rows || any (all (==player)) columns
+  ||  all (==player) diagonalOne || all (==player) diagonalTwo
+  where rowsList = Map.foldr (\x res -> Map.foldr (\y r -> y : r) [] x : res) [] board
+        rows = Map.foldr (\y res -> Map.foldr (\x c -> x : c) [] y : res) [] board
+        columns = foldr (\y r -> map (\x -> x !! y) rowsList : r) [] [0..2]
+        diagonalOne = zipWith (\y r -> r !! y) [0,1,2] rowsList
+        diagonalTwo = zipWith (\y r -> r !! y) [2,1,0] rowsList
 
 checkPlayerOne :: Board -> Bool
 checkPlayerOne board = checkForWin board "x"
