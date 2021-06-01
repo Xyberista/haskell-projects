@@ -14,21 +14,21 @@ jobs:
       - run: stack build
       - run: stack test
       - name: Cache
-      uses: actions/cache@v1
-      env:
-        cache-name: cache-stack
-      with:
-        path: ~/.stack
-        key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.stack') }}-${{ hashFiles('**/stack.project') }}
-        restore-keys: |
-          ${{ runner.os }}-build-${{ env.cache-name }}-
-          ${{ runner.os }}-build-
-          ${{ runner.os }}-
-    - name: Install dependencies
-      run: |
-        stack update
-        stack build
-    - name: Build
-      run: stack build
-    - name: Run tests
-      run: stack test
+        uses: actions/cache@v1
+        env:
+          cache-name: cache-stack
+        with:
+          path: ~/.stack
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.stack') }}-${{ hashFiles('**/stack.project') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+      - name: Install dependencies
+        run: |
+          stack update
+          stack build
+      - name: Build
+        run: stack build
+      - name: Run tests
+        run: stack test
