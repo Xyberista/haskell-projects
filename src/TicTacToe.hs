@@ -1,4 +1,4 @@
-module TicTacToe (runGame) where
+module TicTacToe where
 
 import           Control.Monad.IO.Class
 import           Data.Char
