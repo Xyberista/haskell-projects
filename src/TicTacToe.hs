@@ -20,6 +20,9 @@ instance Eq Move where
 instance Show Move where
   show (Move x y sym) = show x ++ show y ++ sym
 
+gameToList :: Board -> [[String]]
+gameToList board = Map.foldr (\y res -> Map.foldr (\x xs -> (if x == "" then " " else x) : xs) [] y : res) [] board
+
 gameToString :: Board -> String
 gameToString board =
   intercalate "-----\n" $ Map.foldr (\y r -> ((intercalate "|" $ get y) ++ "\n") : r) [] board
