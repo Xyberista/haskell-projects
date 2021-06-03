@@ -43,7 +43,7 @@ spec = do
   describe "display board" $ do
     context "when empty board" $ do
       it "prints empty board" $ do
-        let expected = " | | \n-----\n | | \n-----\n | | \n"
+        let expected = "  0 1 2\n0  | | \n  -----\n1  | | \n  -----\n2  | | \n"
         let game = emptyBoard
         let actual = gameToString game
         actual `shouldBe` expected
@@ -51,7 +51,7 @@ spec = do
   
     context "when non-empty board" $ do
       it "prints board" $ do
-        let expected = "x| | \n-----\n | | \n-----\n | | \n"
+        let expected = "  0 1 2\n0 x| | \n  -----\n1  | | \n  -----\n2  | | \n"
         let (_, game) = makeMove emptyBoard (Move 0 0 "x")
         let actual = gameToString game
         actual `shouldBe` expected

@@ -24,10 +24,9 @@ gameToList :: Board -> [[String]]
 gameToList board = Map.foldr (\y res -> Map.foldr (\x xs -> (if x == "" then " " else x) : xs) [] y : res) [] board
 
 gameToString :: Board -> String
-gameToString board =
-  intercalate "-----\n" $ Map.foldr (\y r -> ((intercalate "|" $ get y) ++ "\n") : r) [] board
-  where get :: Row -> [String]
-        get a = Map.foldr (\x c -> (if x == "" then " " else x) : c) [] a
+gameToString board = "  0 1 2\n" ++ intercalate "  -----\n" newList
+  where rows = gameToList board
+        newList = zipWith (\x n -> concat [show n, " ", intercalate "|" x, "\n"]) rows [0..2]
 
 displayBoard :: Board -> IO ()
 displayBoard game = putStrLn $ gameToString game
